@@ -1,30 +1,25 @@
 <?php
 include 'database.php';
 
-// Load products
-$products = $conn->query("SELECT * FROM products ORDER BY product_name ASC");
+// FIX CUSTOMER QUERY
+$customers = $conn->query("SELECT id, full_name FROM customers");
 
-// Load customers
-$customers = $conn->query("SELECT * FROM customers ORDER BY firstname ASC, lastname ASC");
+// FIX PRODUCT QUERY
+$products = $conn->query("SELECT id, product_name FROM products");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
     $customer_id = $_POST['customer_id'];
     $product_id = $_POST['product_id'];
     $qty = $_POST['qty'];
 
-    // 1. CREATE ORDER (Prepared Statement)
-    $stmt = $conn->prepare("INSERT INTO orders (customer_id, order_date) VALUES (?, NOW())");
-    $stmt->bind_param("i", $customer_id);
-    $stmt->execute();
-    $order_id = $stmt->insert_id;
+    // Create order
+    $conn->query("INSERT INTO orders (customer_id, order_date) VALUES ($customer_id, NOW())");
+    $order_id = $conn->insert_id;
 
-    // 2. INSERT ORDER ITEM
-    $stmt2 = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)");
-    $stmt2->bind_param("iii", $order_id, $product_id, $qty);
-    $stmt2->execute();
+    // Add item
+    $conn->query("INSERT INTO order_items (order_id, product_id, quantity) VALUES ($order_id, $product_id, $qty)");
 
-    header("Location: view_orders.php?created=1");
+    header("Location: view_orders.php");
     exit;
 }
 ?>
@@ -39,24 +34,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <h2>Create Order</h2>
 
 <form method="POST">
-
     <label>Customer</label>
-    <select name="customer_id" required>
+    <select name="customer_id">
         <option value="">-- Select Customer --</option>
         <?php while ($c = $customers->fetch_assoc()): ?>
-            <option value="<?= $c['id'] ?>">
-                <?= $c['firstname'] . " " . $c['lastname'] ?>
-            </option>
+            <option value="<?= $c['id'] ?>"><?= $c['full_name'] ?></option>
         <?php endwhile; ?>
     </select>
 
     <label>Product</label>
-    <select name="product_id" required>
+    <select name="product_id">
         <option value="">-- Select Product --</option>
         <?php while ($p = $products->fetch_assoc()): ?>
-            <option value="<?= $p['id'] ?>">
-                <?= $p['product_name'] ?>
-            </option>
+            <option value="<?= $p['id'] ?>"><?= $p['product_name'] ?></option>
         <?php endwhile; ?>
     </select>
 

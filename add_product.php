@@ -44,7 +44,7 @@ $categories = $conn->query("SELECT * FROM categories");
     <label>Category</label>
     <select name="category_id" required>
         <?php while ($row = $categories->fetch_assoc()): ?>
-            <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+            <option value="<?= $row['id'] ?>"><?= $row['category_name'] ?></option>
         <?php endwhile; ?>
     </select>
 

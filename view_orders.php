@@ -1,61 +1,53 @@
 <?php
-include 'database.php';
+include "database.php";
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>Orders</title>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-<h1>Orders</h1>
+<h2>Orders</h2>
 
 <?php
-$sql = "SELECT 
-            o.id, 
-            o.order_date,
-            CONCAT(c.firstname, ' ', c.lastname) AS customer_name
-        FROM orders o
-        LEFT JOIN customers c ON o.customer_id = c.id
-        ORDER BY o.id DESC";
+$query = "
+    SELECT 
+        o.id, 
+        o.order_date, 
+        c.full_name AS customer_name
+    FROM orders o
+    LEFT JOIN customers c ON o.customer_id = c.id
+    ORDER BY o.id DESC
+";
 
-$res = $conn->query($sql);
+$result = $conn->query($query);
 
-if (!$res) {
+if (!$result) {
     echo "<p style='color:red;'>SQL ERROR: " . $conn->error . "</p>";
-    echo "<p>Query: $sql</p>";
+    echo "<p><strong>Query:</strong> $query</p>";
     exit;
 }
 ?>
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Customer</th>
-            <th>Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>ID</th>
+        <th>Order Date</th>
+        <th>Customer</th>
+    </tr>
 
-<?php while ($row = $res->fetch_assoc()): ?>
+<?php
+while ($row = $result->fetch_assoc()):
+?>
     <tr>
         <td><?= $row['id'] ?></td>
-        <td><?= htmlspecialchars($row['customer_name']) ?></td>
         <td><?= $row['order_date'] ?></td>
-        <td>
-            <a href="view_order.php?id=<?= $row['id'] ?>">View</a>
-        </td>
+        <td><?= $row['customer_name'] ?></td>
     </tr>
 <?php endwhile; ?>
 
-    </tbody>
 </table>
 
-</div>
 </body>
 </html>

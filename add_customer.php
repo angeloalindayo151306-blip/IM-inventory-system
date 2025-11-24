@@ -3,20 +3,24 @@ include 'database.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $firstname = $_POST['firstname'];
-    $lastname = $_POST['lastname'];
+    $full_name = $_POST['full_name']; 
     $email = $_POST['email'];
     $phone = $_POST['phone'];
+    $address = $_POST['address'];
 
     // Prepared statement
-    $stmt = $conn->prepare("INSERT INTO customers (firstname, lastname, email, phone) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $firstname, $lastname, $email, $phone);
-    $stmt->execute();
+    $stmt = $conn->prepare("INSERT INTO customers (full_name, email, phone, address) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $full_name, $email, $phone, $address);
 
-    header("Location: add_customer.php?success=1");
-    exit;
+    if ($stmt->execute()) {
+        header("Location: add_customer.php?success=1");
+        exit;
+    } else {
+        echo "Error: " . $stmt->error;
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,19 +37,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <form method="POST">
 
-    <label>First Name</label>
-    <input type="text" name="firstname" required>
-
-    <label>Last Name</label>
-    <input type="text" name="lastname" required>
+    <label>Full Name</label>
+    <input type="text" name="full_name" required>
 
     <label>Email</label>
     <input type="email" name="email" required>
 
     <label>Phone</label>
-    <input type="text" name="phone" required>
+    <input type="text" name="phone">
+
+    <label>Address</label>
+    <textarea name="address"></textarea>
 
     <button type="submit">Add Customer</button>
+
 </form>
 
 </body>
