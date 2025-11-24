@@ -1,0 +1,91 @@
+/* Global UI Setup */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f6f9;
+  font-family: Arial, sans-serif;
+}
+
+/* Main container */
+.container {
+  width: 85%;
+  max-width: 1100px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Logo */
+.logo {
+  width: 90px;
+  height: auto;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* Title */
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+/* Action buttons */
+.actions {
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-right: 10px;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background: #0056b3;
+}
+
+/* Table styling */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.styled-table th {
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+.styled-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.styled-table tr:hover {
+  background: #f1f1f1;
+}
+
+/* Links */
+.link-edit {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.link-delete {
+  color: #d9534f;
+  text-decoration: none;
+}
+
+.link-delete:hover {
+  color: #b52b27;
+}
