@@ -1,10 +1,4 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 20px;
-}
-
+/* ===== GENERAL FORM & TABLE STYLES ===== */
 h2 {
     text-align: center;
     color: #333;
@@ -53,6 +47,7 @@ button:hover {
     background: #2980b9;
 }
 
+/* ===== TABLE STYLING ===== */
 table {
     width: 100%;
     max-width: 800px;
@@ -87,7 +82,7 @@ tr:nth-child(even) {
     background: #ffffff;
     padding: 10px 18px;
     margin-right: 10px;
-    border-radius: 25px;  /* rounded buttons */
+    border-radius: 25px;
     border: 1px solid #ccc;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: 0.2s;
@@ -98,4 +93,69 @@ tr:nth-child(even) {
     color: white;
     border-color: #007bff;
     transform: translateY(-2px);
+}
+/* ===== LANDING PAGE STYLES ===== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    background-image: url("vantaBackground.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;  /* more responsive */
+    background-position: center;
+}
+
+header {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 4rem;
+    margin: 0;
+    letter-spacing: 4px;
+}
+
+.landing h2 {
+    font-weight: 300;
+    margin-top: 10px;
+    color: #fff; /* overrides CRUD color */
+}
+
+.intro {
+    max-width: 900px;
+    margin: 40px auto;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    text-align: center;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 20px;
+}
+
+a.btn {
+    padding: 15px 30px;
+    background-color: #fff;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+a.btn:hover {
+    background-color: #444;
+    color: #fff;
+}
+
+footer {
+    margin-top: 80px;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.7;
 }
