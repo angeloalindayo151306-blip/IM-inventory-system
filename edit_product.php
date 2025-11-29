@@ -1,90 +1,129 @@
 <?php
-// edit_product.php
 include 'database.php';
 
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-if ($id === 0) {
-    header('Location: index.php');
+// 1. Validate and get ID
+if (!isset($_GET['id'])) {
+    header("Location: view_products.php");
     exit;
 }
 
-// handle POST update
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_name = trim($_POST['product_name']);
-    $category_id = ($_POST['category_id'] === '') ? null : intval($_POST['category_id']);
-    $description = trim($_POST['description']);
-    $price = floatval($_POST['price']);
-    $stock = intval($_POST['stock']);
-
-    $stmt = $conn->prepare("UPDATE products SET category_id = ?, product_name = ?, description = ?, price = ?, stock = ? WHERE id = ?");
-    $stmt->bind_param('issdii', $category_id, $product_name, $description, $price, $stock, $id);
-    $stmt->execute();
-    $stmt->close();
-
-    header('Location: index.php');
+$id = (int)$_GET['id'];
+if ($id <= 0) {
+    header("Location: view_products.php");
     exit;
 }
 
-// fetch product
-$stmt = $conn->prepare("SELECT id, category_id, product_name, description, price, stock FROM products WHERE id = ?");
-$stmt->bind_param('i', $id);
+// 2. If form submitted: update product
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $name        = trim($_POST['name'] ?? '');
+    $category_id = (int)($_POST['category_id'] ?? 0);
+    $price       = (float)($_POST['price'] ?? 0);
+    $stock       = (int)($_POST['stock'] ?? 0);
+
+    if ($name !== '' && $category_id > 0) {
+        $stmt = $conn->prepare(
+            "UPDATE products
+             SET product_name = ?, category_id = ?, price = ?, stock = ?
+             WHERE id = ?"
+        );
+        if (!$stmt) {
+            die("Prepare failed: " . $conn->error);
+        }
+
+        $stmt->bind_param("sidii", $name, $category_id, $price, $stock, $id);
+        $stmt->execute();
+
+        header("Location: view_products.php");
+        exit;
+    }
+}
+
+// 3. Load product data
+$stmt = $conn->prepare(
+    "SELECT id, product_name, category_id, price, stock
+     FROM products
+     WHERE id = ?"
+);
+$stmt->bind_param("i", $id);
 $stmt->execute();
-$res = $stmt->get_result();
-$product = $res->fetch_assoc();
-$stmt->close();
+$product = $stmt->get_result()->fetch_assoc();
 
 if (!$product) {
     echo "Product not found.";
     exit;
 }
 
-// categories for dropdown
-$cats = $conn->query("SELECT id, category_name FROM categories ORDER BY category_name");
+// 4. Load categories for dropdown
+$categories = $conn->query("SELECT id, category_name FROM categories ORDER BY category_name");
 ?>
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Edit Product</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<div class="container">
-  <h1>Edit Product</h1>
-  <form method="post">
-    <div class="form-row">
-      <label>Product Name</label>
-      <input type="text" name="product_name" required value="<?= htmlspecialchars($product['product_name']) ?>">
-    </div>
+<body class="add-product-page">
+<div class="page-wrapper">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Edit Product</h1>
+            <a href="view_products.php" class="back-link">← Back to Products</a>
+        </div>
 
-    <div class="form-row">
-      <label>Category</label>
-      <select name="category_id">
-        <option value="">-- Select category --</option>
-        <?php while ($c = $cats->fetch_assoc()): ?>
-          <option value="<?= $c['id'] ?>" <?= ($product['category_id'] == $c['id']) ? 'selected' : '' ?>><?= htmlspecialchars($c['category_name']) ?></option>
-        <?php endwhile; ?>
-      </select>
-    </div>
+        <form method="POST" class="form-vertical">
+            <div class="form-group">
+                <label for="name">Product Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="<?= htmlspecialchars($product['product_name']) ?>"
+                    required
+                >
+            </div>
 
-    <div class="form-row">
-      <label>Description</label>
-      <textarea name="description"><?= htmlspecialchars($product['description']) ?></textarea>
-    </div>
+            <div class="form-group">
+                <label for="category_id">Category</label>
+                <select id="category_id" name="category_id" required>
+                    <option value="" disabled>Select a category</option>
+                    <?php while ($row = $categories->fetch_assoc()): ?>
+                        <option value="<?= htmlspecialchars($row['id']) ?>"
+                            <?= $row['id'] == $product['category_id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($row['category_name']) ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-    <div class="form-row">
-      <label>Price</label>
-      <input type="number" name="price" step="0.01" required value="<?= htmlspecialchars($product['price']) ?>">
-    </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="price"
+                        name="price"
+                        value="<?= htmlspecialchars($product['price']) ?>"
+                        required
+                    >
+                </div>
 
-    <div class="form-row">
-      <label>Stock</label>
-      <input type="number" name="stock" required value="<?= htmlspecialchars($product['stock']) ?>">
-    </div>
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input
+                        type="number"
+                        id="stock"
+                        name="stock"
+                        value="<?= htmlspecialchars($product['stock']) ?>"
+                        required
+                    >
+                </div>
+            </div>
 
-    <input type="submit" value="Save Changes" class="btn">
-    <a href="index.php" class="btn">Back</a>
-  </form>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>

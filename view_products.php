@@ -34,7 +34,7 @@ $res = $conn->query($sql);
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
-                <th style="width:110px;">Action</th>
+                <th style="width:150px;">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -47,6 +47,12 @@ $res = $conn->query($sql);
                         <td><?= htmlspecialchars($row['price']) ?></td>
                         <td><?= htmlspecialchars($row['stock']) ?></td>
                         <td>
+                            <a href="edit_product.php?id=<?= $row['id'] ?>"
+                               class="btn-primary"
+                               style="font-size:12px;padding:4px 10px;margin-right:6px;">
+                                Edit
+                            </a>
+
                             <a href="delete_product.php?id=<?= $row['id'] ?>"
                                class="btn-outline"
                                style="font-size:12px;padding:4px 10px;"
