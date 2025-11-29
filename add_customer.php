@@ -2,56 +2,81 @@
 include 'database.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $full_name = trim($_POST['full_name'] ?? '');
+    $email     = trim($_POST['email'] ?? '');
+    $phone     = trim($_POST['phone'] ?? '');
+    $address   = trim($_POST['address'] ?? '');
 
-    $full_name = $_POST['full_name']; 
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
+    if ($full_name !== '') {
+        $stmt = $conn->prepare(
+            "INSERT INTO customers (full_name, email, phone, address)
+             VALUES (?, ?, ?, ?)"
+        );
+        $stmt->bind_param("ssss", $full_name, $email, $phone, $address);
+        $stmt->execute();
 
-    // Prepared statement
-    $stmt = $conn->prepare("INSERT INTO customers (full_name, email, phone, address) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $full_name, $email, $phone, $address);
+        $customer_id = $stmt->insert_id;
 
-    if ($stmt->execute()) {
-        header("Location: add_customer.php?success=1");
+        header("Location: add_customer.php?success=1&customer_id=" . $customer_id);
         exit;
-    } else {
-        echo "Error: " . $stmt->error;
     }
 }
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="style.css">
-<title>Add Customer</title>
+    <meta charset="UTF-8">
+    <title>Add Customer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="customers-page">
+<div class="page-wrapper">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Add Customer</h1>
+            <a href="home.php" class="back-link">← Back to Dashboard</a>
+        </div>
 
-<h2>Add Customer</h2>
-
-<?php if (isset($_GET['success'])): ?>
-<p style="color: green;">Customer added successfully!</p>
+        <?php if (isset($_GET['success'])): ?>
+    <p class="success-message">
+        Customer added successfully!
+        <?php if (!empty($_GET['customer_id'])): ?>
+            (ID: <?= htmlspecialchars($_GET['customer_id']) ?>)
+        <?php endif; ?>
+    </p>
 <?php endif; ?>
 
-<form method="POST">
+<div style="margin-bottom:14px;">
+    <a href="view_customers.php" class="btn-primary">
+        View Customers
+    </a>
+</div>
 
-    <label>Full Name</label>
-    <input type="text" name="full_name" required>
+        <form method="POST" class="form-vertical">
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input id="full_name" name="full_name" type="text" required>
+            </div>
 
-    <label>Email</label>
-    <input type="email" name="email" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input id="phone" name="phone" type="text">
+                </div>
+            </div>
 
-    <label>Phone</label>
-    <input type="text" name="phone">
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" rows="2"></textarea>
+            </div>
 
-    <label>Address</label>
-    <textarea name="address"></textarea>
-
-    <button type="submit">Add Customer</button>
-
-</form>
-
+            <button type="submit" class="btn-primary">Add Customer</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
